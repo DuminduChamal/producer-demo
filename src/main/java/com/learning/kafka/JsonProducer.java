@@ -21,7 +21,7 @@ public class JsonProducer {
             OrderEvent order = new OrderEvent("order-123", 49.99, System.currentTimeMillis());
 
             ProducerRecord<String, OrderEvent> record =
-                    new ProducerRecord<>("keyed-topic", order.getOrderId(), order);
+                    new ProducerRecord<>("orders-topic", order.getOrderId(), order);
 
             RecordMetadata metadata = producer.send(record).get();
             System.out.printf("Sent %s -> partition=%d offset=%d%n", order, metadata.partition(), metadata.offset());
