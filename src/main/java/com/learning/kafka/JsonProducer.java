@@ -8,6 +8,11 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 
+// Change vs. SimpleProducer: sends an actual Java object (OrderEvent)
+// instead of a String, via the custom JsonSerializer below. Kafka ships no
+// built-in JSON serializer, so this is the minimal way to move beyond
+// primitive types — Serializer<T> is the same extension point
+// StringSerializer implements.
 public class JsonProducer {
 
     public static void main(String[] args) throws Exception {

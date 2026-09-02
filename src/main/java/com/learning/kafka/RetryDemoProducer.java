@@ -7,6 +7,14 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 
+// Change vs. SimpleProducer: shortens delivery.timeout.ms/request.timeout.ms/
+// retry.backoff.ms so retry behavior is observable in seconds instead of the
+// 2-minute default. Meant to be run against a broker you manually stop and
+// (optionally) restart mid-send, to watch retries happen silently in the
+// background and either succeed once the broker returns or time out.
+// Retries are safe from duplication because enable.idempotence=true is the
+// default since Kafka 3.0 — the broker dedupes by producer ID + sequence
+// number rather than appending the same record twice.
 public class RetryDemoProducer {
 
     public static void main(String[] args) throws Exception {

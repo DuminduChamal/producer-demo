@@ -9,6 +9,11 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.Properties;
 //import java.util.concurrent.atomic.AtomicInteger;
 
+// Baseline producer: the simplest possible send — one record, synchronous
+// (.get() blocks until acked), default acks/retries/batching. Every other
+// producer in this project is a variation that changes exactly one thing
+// relative to this one — async sends, batching config, retry behavior, or
+// serialization — so this is the reference point to compare them against.
 public class SimpleProducer {
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();

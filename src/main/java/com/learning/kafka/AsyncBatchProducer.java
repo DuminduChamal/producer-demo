@@ -8,6 +8,11 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// Change vs. SimpleProducer: fires sends asynchronously with a callback
+// instead of blocking on .get() per record, so multiple records can
+// actually accumulate into a batch before being sent as one request.
+// Batching (linger.ms/batch.size below) only has an effect on async sends —
+// a sync send-then-block loop never has more than one record in flight.
 public class AsyncBatchProducer {
 
     public static void main(String[] args) throws Exception {

@@ -8,6 +8,11 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 
+// Change vs. SimpleProducer: sends multiple keyed messages instead of one
+// unkeyed message. Demonstrates that the default partitioner routes by
+// hash(key) % numPartitions — same key always lands on the same partition,
+// which is the mechanism behind per-key ordering (Kafka only guarantees
+// order within a partition, not across a whole topic).
 public class KeyedProducer {
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();
