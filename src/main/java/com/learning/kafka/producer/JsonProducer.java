@@ -1,5 +1,7 @@
-package com.learning.kafka;
+package com.learning.kafka.producer;
 
+import com.learning.kafka.dto.OrderEvent;
+import com.learning.kafka.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;

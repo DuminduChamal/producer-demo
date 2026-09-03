@@ -1,5 +1,6 @@
-package com.learning.kafka;
+package com.learning.kafka.producer;
 
+import com.learning.kafka.OrderEventAvro;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;

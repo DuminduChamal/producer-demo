@@ -50,12 +50,12 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-<!--                    <mainClass>com.learning.kafka.SimpleProducer</mainClass>-->
-<!--                    <mainClass>com.learning.kafka.KeyedProducer</mainClass>-->
-<!--                    <mainClass>com.learning.kafka.AsyncBatchProducer</mainClass>-->
-<!--                    <mainClass>com.learning.kafka.RetryDemoProducer</mainClass>-->
-<!--                    <mainClass>com.learning.kafka.JsonProducer</mainClass>-->
-                    <mainClass>com.learning.kafka.AvroProducer</mainClass>
+<!--                    <mainClass>com.learning.kafka.producer.SimpleProducer</mainClass>-->
+<!--                    <mainClass>com.learning.kafka.producer.KeyedProducer</mainClass>-->
+<!--                    <mainClass>com.learning.kafka.producer.AsyncBatchProducer</mainClass>-->
+<!--                    <mainClass>com.learning.kafka.producer.RetryDemoProducer</mainClass>-->
+<!--                    <mainClass>com.learning.kafka.producer.JsonProducer</mainClass>-->
+                    <mainClass>com.learning.kafka.producer.AvroProducer</mainClass>
                 </configuration>
             </plugin>
             <plugin>
