@@ -13,10 +13,10 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -5911628118852131765L;
+  private static final long serialVersionUID = 8800909371705783362L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OrderEventAvro\",\"namespace\":\"com.learning.kafka\",\"fields\":[{\"name\":\"orderId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"timestamp\",\"type\":\"long\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OrderEventAvro\",\"namespace\":\"com.learning.kafka\",\"fields\":[{\"name\":\"orderId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"timestamp\",\"type\":\"long\"},{\"name\":\"customerId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"default\":\"default-customer\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -75,6 +75,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
   private java.lang.String orderId;
   private double amount;
   private long timestamp;
+  private java.lang.String customerId;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -88,11 +89,13 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
    * @param orderId The new value for orderId
    * @param amount The new value for amount
    * @param timestamp The new value for timestamp
+   * @param customerId The new value for customerId
    */
-  public OrderEventAvro(java.lang.String orderId, java.lang.Double amount, java.lang.Long timestamp) {
+  public OrderEventAvro(java.lang.String orderId, java.lang.Double amount, java.lang.Long timestamp, java.lang.String customerId) {
     this.orderId = orderId;
     this.amount = amount;
     this.timestamp = timestamp;
+    this.customerId = customerId;
   }
 
   @Override
@@ -108,6 +111,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
     case 0: return orderId;
     case 1: return amount;
     case 2: return timestamp;
+    case 3: return customerId;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -120,6 +124,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
     case 0: orderId = value$ != null ? value$.toString() : null; break;
     case 1: amount = (java.lang.Double)value$; break;
     case 2: timestamp = (java.lang.Long)value$; break;
+    case 3: customerId = value$ != null ? value$.toString() : null; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -176,6 +181,23 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
   }
 
   /**
+   * Gets the value of the 'customerId' field.
+   * @return The value of the 'customerId' field.
+   */
+  public java.lang.String getCustomerId() {
+    return customerId;
+  }
+
+
+  /**
+   * Sets the value of the 'customerId' field.
+   * @param value the value to set.
+   */
+  public void setCustomerId(java.lang.String value) {
+    this.customerId = value;
+  }
+
+  /**
    * Creates a new OrderEventAvro RecordBuilder.
    * @return A new OrderEventAvro RecordBuilder
    */
@@ -219,6 +241,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
     private java.lang.String orderId;
     private double amount;
     private long timestamp;
+    private java.lang.String customerId;
 
     /** Creates a new Builder */
     private Builder() {
@@ -243,6 +266,10 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
         this.timestamp = data().deepCopy(fields()[2].schema(), other.timestamp);
         fieldSetFlags()[2] = other.fieldSetFlags()[2];
       }
+      if (isValidValue(fields()[3], other.customerId)) {
+        this.customerId = data().deepCopy(fields()[3].schema(), other.customerId);
+        fieldSetFlags()[3] = other.fieldSetFlags()[3];
+      }
     }
 
     /**
@@ -262,6 +289,10 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
       if (isValidValue(fields()[2], other.timestamp)) {
         this.timestamp = data().deepCopy(fields()[2].schema(), other.timestamp);
         fieldSetFlags()[2] = true;
+      }
+      if (isValidValue(fields()[3], other.customerId)) {
+        this.customerId = data().deepCopy(fields()[3].schema(), other.customerId);
+        fieldSetFlags()[3] = true;
       }
     }
 
@@ -383,6 +414,46 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
       return this;
     }
 
+    /**
+      * Gets the value of the 'customerId' field.
+      * @return The value.
+      */
+    public java.lang.String getCustomerId() {
+      return customerId;
+    }
+
+
+    /**
+      * Sets the value of the 'customerId' field.
+      * @param value The value of 'customerId'.
+      * @return This builder.
+      */
+    public com.learning.kafka.OrderEventAvro.Builder setCustomerId(java.lang.String value) {
+      validate(fields()[3], value);
+      this.customerId = value;
+      fieldSetFlags()[3] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'customerId' field has been set.
+      * @return True if the 'customerId' field has been set, false otherwise.
+      */
+    public boolean hasCustomerId() {
+      return fieldSetFlags()[3];
+    }
+
+
+    /**
+      * Clears the value of the 'customerId' field.
+      * @return This builder.
+      */
+    public com.learning.kafka.OrderEventAvro.Builder clearCustomerId() {
+      customerId = null;
+      fieldSetFlags()[3] = false;
+      return this;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public OrderEventAvro build() {
@@ -391,6 +462,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
         record.orderId = fieldSetFlags()[0] ? this.orderId : (java.lang.String) defaultValue(fields()[0]);
         record.amount = fieldSetFlags()[1] ? this.amount : (java.lang.Double) defaultValue(fields()[1]);
         record.timestamp = fieldSetFlags()[2] ? this.timestamp : (java.lang.Long) defaultValue(fields()[2]);
+        record.customerId = fieldSetFlags()[3] ? this.customerId : (java.lang.String) defaultValue(fields()[3]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -429,6 +501,8 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
     out.writeLong(this.timestamp);
 
+    out.writeString(this.customerId);
+
   }
 
   @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
@@ -442,8 +516,10 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
       this.timestamp = in.readLong();
 
+      this.customerId = in.readString();
+
     } else {
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 4; i++) {
         switch (fieldOrder[i].pos()) {
         case 0:
           this.orderId = in.readString();
@@ -455,6 +531,10 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
         case 2:
           this.timestamp = in.readLong();
+          break;
+
+        case 3:
+          this.customerId = in.readString();
           break;
 
         default:
@@ -470,6 +550,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
     result = 31 * result + (orderId == null ? 0 : orderId.hashCode());
     result = 31 * result + Double.hashCode(amount);
     result = 31 * result + Long.hashCode(timestamp);
+    result = 31 * result + (customerId == null ? 0 : customerId.hashCode());
     return result;
   }
 
@@ -489,6 +570,9 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
       return false;
     }
     if (this.timestamp != other.timestamp) {
+      return false;
+    }
+    if (!java.util.Objects.equals(this.customerId, other.customerId)) {
       return false;
     }
     return true;

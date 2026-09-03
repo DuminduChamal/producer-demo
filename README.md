@@ -103,6 +103,23 @@ want to run by setting `mainClass` in `pom.xml`, then:
 mvn compile exec:java
 ```
 
+**If you've just changed a schema or a source file and this throws
+`ClassNotFoundException` for a class that clearly exists**, run the two
+phases as separate commands instead:
+
+```bash
+mvn compile
+mvn exec:java
+```
+
+Hit this twice while iterating on `AvroProducer` right after schema changes
+triggered `avro-maven-plugin` regeneration — `mvn compile exec:java` combined
+intermittently couldn't see the freshly compiled class within the same
+Maven invocation, even though `mvn compile` alone reported `BUILD SUCCESS`.
+Splitting it into two invocations worked reliably both times. Looks like an
+`exec-maven-plugin` classloader quirk rather than anything wrong with the
+code — worth reaching for this first before assuming a real compile problem.
+
 ## Examples, in the order they were built
 
 ### 1. `SimpleProducer`
@@ -248,6 +265,46 @@ the previously generated class kept its old `CharSequence` getters until the
 generated file was deleted and `mvn generate-sources` re-run. Changing
 plugin config, unlike changing the schema itself, doesn't automatically
 trigger regeneration.
+
+### Schema evolution: what Schema Registry actually rejects
+
+Tested by deliberately evolving `OrderEventAvro.avsc` and watching what
+happens to `AvroProducer` under the default `BACKWARD` compatibility mode
+(a new schema must be able to read data written with the old one).
+
+**Adding a required field with no default is rejected.** Adding
+`{ "name": "customerId", "type": "string" }` (no `default`) and sending
+failed immediately, before the message ever left the producer:
+
+```
+org.apache.kafka.common.errors.SerializationException: Error registering Avro schema...
+Caused by: io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException:
+Schema being registered is incompatible with an earlier schema for subject "avro-orders-topic-value",
+details: [{errorType:'READER_FIELD_MISSING_DEFAULT_VALUE', description:'The field customerId ...
+has no default value and is missing in the old schema'} ...]; error code: 40901
+```
+
+Old data doesn't have `customerId`; a new reader schema requiring it has
+nothing to fill it in with — `BACKWARD`-incompatible, registration refused,
+`send()` throws.
+
+**Adding the same field with a default succeeds.** Changing it to
+`{ "name": "customerId", "type": "string", "default": "default-customer" }`
+registered cleanly as schema version 2 (`curl .../versions` → `[1,2]`) — now
+a new reader schema can fill in `"default-customer"` for any old record that
+doesn't have the field.
+
+**Removing a field is the opposite of what you'd expect — it's actually
+safe.** The intuitive guess is that removing a field is the "smaller,
+safer" change and adding one is riskier; under `BACKWARD` compatibility
+it's the other way around. Removing a field means the *new* reader schema
+simply doesn't ask for it — when reading old data that still has it, the
+extra bytes are just ignored. No default needed, no rejection. What removing
+a field does **not** do is delete anything from the topic itself: Kafka's
+log is immutable, schema changes are a serialization/deserialization
+concern only, and old messages keep every byte they were written with —
+removing `amount` from the schema just means the current generated class
+has no `getAmount()` to read it back out with, not that the data is gone.
 
 ## Verifying output
 

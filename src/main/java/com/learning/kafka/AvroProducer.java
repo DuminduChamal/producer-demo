@@ -32,6 +32,7 @@ public class AvroProducer {
                     .setOrderId("order-avro-1")
                     .setAmount(75.50)
                     .setTimestamp(System.currentTimeMillis())
+                    .setCustomerId("cust-01")
                     .build();
 
             ProducerRecord<String, OrderEventAvro> record =
