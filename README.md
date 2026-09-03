@@ -17,6 +17,8 @@ which reads back everything sent here.
 - **A local Kafka 4.3.1 broker**, running in KRaft mode (no ZooKeeper) at
   `localhost:9092`. This repo contains only the producer code — the broker
   is expected to run separately, from a standalone Kafka download.
+- **Confluent Schema Registry**, running at `localhost:8081` — only needed
+  for `AvroProducer`. See setup below.
 
 ## Setting up the broker (once)
 
@@ -38,6 +40,27 @@ this repo — if it stops (closed terminal, crash), every producer/consumer
 loses its connection until it's restarted. Nothing here manages that for
 you.
 
+## Setting up Schema Registry (for `AvroProducer`)
+
+Schema Registry isn't part of Apache Kafka — it's a Confluent component.
+Download **Confluent Platform 8.3.1** from
+[confluent.io/download](https://www.confluent.io/download/), extract it
+somewhere separate from `kafka/`, and run **only** the Schema Registry piece
+(not Confluent's bundled Kafka/ZooKeeper) pointed at the broker above.
+
+In `etc/schema-registry/schema-registry.properties`, set:
+```properties
+kafkastore.bootstrap.servers=PLAINTEXT://localhost:9092
+listeners=http://0.0.0.0:8081
+```
+
+Start it (with the broker already running):
+```bash
+bin/schema-registry-start etc/schema-registry/schema-registry.properties
+```
+
+Verify: `curl http://localhost:8081/subjects` should return `[]` initially.
+
 ## Topics used by these examples
 
 ```bash
@@ -48,6 +71,9 @@ bin/kafka-topics.sh --create --topic keyed-topic \
   --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
 
 bin/kafka-topics.sh --create --topic orders-topic \
+  --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+
+bin/kafka-topics.sh --create --topic avro-orders-topic \
   --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
 ```
 
@@ -60,7 +86,9 @@ bin/kafka-topics.sh --create --topic orders-topic \
   consumer outright — it throws on the first non-JSON record instead of
   skipping it. In general, **one topic should carry one consistent message
   schema**; this is exactly the problem a Schema Registry solves in
-  production.
+  production — see `AvroProducer` below.
+- `avro-orders-topic` (3 partitions) — used by `AvroProducer`, kept separate
+  from `orders-topic` since it carries Avro's binary wire format, not JSON.
 
 All three topics use `replication-factor=1` because this is a single-broker
 setup — see the `acks` note under `AsyncBatchProducer` below for why that
@@ -194,6 +222,33 @@ with a Schema Registry, where producers and consumers validate against a
 shared, versioned schema and incompatible changes get rejected at write
 time instead of breaking something downstream later.
 
+### 6. `AvroProducer` (with `OrderEventAvro`, generated from `src/main/avro/OrderEventAvro.avsc`)
+Sends to `avro-orders-topic` using Confluent's `KafkaAvroSerializer` instead
+of the hand-rolled `JsonSerializer`. This is the schema-enforcement step
+`JsonProducer`'s section above flags as "next": `schema.registry.url` isn't
+optional config here — Avro serialization registers the schema with Schema
+Registry on first send and validates every subsequent send against it,
+which is the actual mechanism that closes the gap JSON leaves open.
+
+`OrderEventAvro` isn't hand-written — `avro-maven-plugin` generates it from
+the `.avsc` schema file at build time (`mvn generate-sources`, which also
+runs automatically as part of `mvn compile`). Confluent's artifacts aren't
+on Maven Central, so `pom.xml` adds `https://packages.confluent.io/maven/`
+as a repository.
+
+**Gotcha worth knowing**: Avro's generated `string` fields default to
+`java.lang.CharSequence`, not `java.lang.String` — passing one directly as
+a `ProducerRecord<String, ...>` key fails to compile (`inference variable K
+has incompatible bounds`). Fixed here by adding `<stringType>String</stringType>`
+to the `avro-maven-plugin` configuration, so generated fields behave like
+normal `String`s (matching `OrderEvent`, the JSON POJO). **Also worth
+knowing**: the plugin's staleness check only looks at the `.avsc` file's
+timestamp, not the plugin's own configuration — after adding `stringType`,
+the previously generated class kept its old `CharSequence` getters until the
+generated file was deleted and `mvn generate-sources` re-run. Changing
+plugin config, unlike changing the schema itself, doesn't automatically
+trigger regeneration.
+
 ## Verifying output
 
 Watch messages land in `keyed-topic`, including which partition and key each
@@ -209,14 +264,36 @@ For `JsonProducer`, point the same command at `orders-topic` instead — the
 raw JSON bytes print as text, since the console consumer has no idea (and
 doesn't need to know) what's inside them.
 
+For `AvroProducer`, the plain console consumer can't read Avro's binary
+format — use Confluent's `kafka-avro-console-consumer` instead (ships with
+the same Confluent Platform download as Schema Registry):
+```bash
+bin/kafka-avro-console-consumer --topic avro-orders-topic --from-beginning \
+  --bootstrap-server localhost:9092 --property schema.registry.url=http://localhost:8081
+```
+
+Or check the registered schema directly via Schema Registry's REST API:
+```bash
+curl http://localhost:8081/subjects
+curl http://localhost:8081/subjects/avro-orders-topic-value/versions/1
+```
+
 ## What's next
 
 Producer-side topics not yet covered here: compression (`compression.type`),
 `buffer.memory` / backpressure, transactional/exactly-once producers, and
 custom partitioners.
 
+**Confluent Cloud** is the next big step: reconfiguring `AvroProducer` to
+point at a managed Confluent Cloud cluster and its managed Schema Registry
+instead of localhost — same Avro schema and generated class, only the
+connection details (`bootstrap.servers`, `security.protocol=SASL_SSL`,
+`sasl.jaas.config` with an API key/secret, and the cloud Schema Registry URL
++ credentials) change. Requires creating a Confluent Cloud account first.
+
 On the consumer side (see [`consumer-demo`](https://github.com/DuminduChamal/consumer-demo)),
 everything sent here gets read back with a real `KafkaConsumer`: consumer
 groups and rebalancing, manual offset commits (`commitSync`/`commitAsync`)
-and the delivery-guarantee trade-offs they control, and a matching
-`Deserializer<OrderEvent>` for the JSON messages produced here.
+and the delivery-guarantee trade-offs they control, and matching
+`Deserializer<OrderEvent>`/`AvroConsumer` counterparts for the JSON and Avro
+messages produced here.
