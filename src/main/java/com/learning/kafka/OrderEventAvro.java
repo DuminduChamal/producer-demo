@@ -11,12 +11,13 @@ import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 
+/** Avro counterpart to OrderEvent (the hand-written JSON POJO). Registered with Schema Registry under subject avro-orders-topic-value; compatibility mode is BACKWARD. */
 @org.apache.avro.specific.AvroGenerated
 public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = 8800909371705783362L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OrderEventAvro\",\"namespace\":\"com.learning.kafka\",\"fields\":[{\"name\":\"orderId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"timestamp\",\"type\":\"long\"},{\"name\":\"customerId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"default\":\"default-customer\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OrderEventAvro\",\"namespace\":\"com.learning.kafka\",\"doc\":\"Avro counterpart to OrderEvent (the hand-written JSON POJO). Registered with Schema Registry under subject avro-orders-topic-value; compatibility mode is BACKWARD.\",\"fields\":[{\"name\":\"orderId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"timestamp\",\"type\":\"long\"},{\"name\":\"customerId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.\",\"default\":\"default-customer\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -75,6 +76,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
   private java.lang.String orderId;
   private double amount;
   private long timestamp;
+  /** Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value. */
   private java.lang.String customerId;
 
   /**
@@ -89,7 +91,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
    * @param orderId The new value for orderId
    * @param amount The new value for amount
    * @param timestamp The new value for timestamp
-   * @param customerId The new value for customerId
+   * @param customerId Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.
    */
   public OrderEventAvro(java.lang.String orderId, java.lang.Double amount, java.lang.Long timestamp, java.lang.String customerId) {
     this.orderId = orderId;
@@ -182,7 +184,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
   /**
    * Gets the value of the 'customerId' field.
-   * @return The value of the 'customerId' field.
+   * @return Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.
    */
   public java.lang.String getCustomerId() {
     return customerId;
@@ -191,6 +193,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
   /**
    * Sets the value of the 'customerId' field.
+   * Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.
    * @param value the value to set.
    */
   public void setCustomerId(java.lang.String value) {
@@ -241,6 +244,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
     private java.lang.String orderId;
     private double amount;
     private long timestamp;
+    /** Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value. */
     private java.lang.String customerId;
 
     /** Creates a new Builder */
@@ -416,6 +420,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
     /**
       * Gets the value of the 'customerId' field.
+      * Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.
       * @return The value.
       */
     public java.lang.String getCustomerId() {
@@ -425,6 +430,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
     /**
       * Sets the value of the 'customerId' field.
+      * Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.
       * @param value The value of 'customerId'.
       * @return This builder.
       */
@@ -437,6 +443,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
     /**
       * Checks whether the 'customerId' field has been set.
+      * Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.
       * @return True if the 'customerId' field has been set, false otherwise.
       */
     public boolean hasCustomerId() {
@@ -446,6 +453,7 @@ public class OrderEventAvro extends org.apache.avro.specific.SpecificRecordBase 
 
     /**
       * Clears the value of the 'customerId' field.
+      * Added as schema version 2. Required a default to register successfully under BACKWARD compatibility - old records without this field are read back with this default value.
       * @return This builder.
       */
     public com.learning.kafka.OrderEventAvro.Builder clearCustomerId() {
